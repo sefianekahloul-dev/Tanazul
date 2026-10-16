@@ -3,9 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta property="og:title" content="Tanazul">
+<meta property="og:description" content="Off-plan contract resale in Qatar. Sellers recover their equity. Buyers get last-cycle prices.">
+<meta property="og:image" content="https://sefianekahloul-dev.github.io/Tanazul/preview.png">
+<meta property="og:url" content="https://sefianekahloul-dev.github.io/Tanazul/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Tanazul: the marketplace for off-plan property contracts in Qatar. Sellers recover their equity. Buyers get last-cycle prices.">
 <style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Tanazul Off-Plan Resale</title>
+<title>Tanazul</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -548,7 +554,7 @@ function applyLang(){
   document.querySelectorAll("[data-t]").forEach(el=>{const k=el.dataset.t;el.textContent=(T[lang][k]??T.en[k])});
   document.querySelectorAll("#s-area option,#s-type option,#s-fin option").forEach(o=>o.textContent=w(o.value));
   const b=document.getElementById("lang"); b.textContent=lang==="ar"?"English":"العربية"; b.lang=lang==="ar"?"en":"ar";
-  document.title=lang==="ar"?"تنازل · إعادة بيع العقارات على الخارطة":"Tanazul Off-Plan Resale";
+  document.title=lang==="ar"?"تنازل · إعادة بيع العقارات على الخارطة":"Tanazul";
   renderChips(); render(); sell();
 }
 document.getElementById("lang").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";try{localStorage.setItem("tanazul-lang",lang)}catch(e){};applyLang()});
