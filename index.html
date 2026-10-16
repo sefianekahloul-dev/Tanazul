@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Tanazul: the marketplace for off-plan property contracts in Qatar. Sellers recover their equity. Buyers get last-cycle prices.">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Tanazul Off-Plan Resale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky app bar with language toggle and 3 tabs; one column of listing cards on phone, 2 on wide screens; ledger-style money rows; full RTL in Arabic */
+:root{
+  --bg:#F4F3F5; --surface:#FFFFFF; --fg:#1E1A1D; --muted:#6B6268; --line:#E3DEE1;
+  --accent:#8A1538; --accent-2:#C2577A; --accent-soft:#F6E7EC; --good:#1F7A55; --good-soft:#E3F2EA; --warn:#9A6400; --warn-soft:#FBF0DC;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151214; --surface:#1F1B1E; --fg:#F1ECEF; --muted:#A99FA5; --line:#342D32;
+  --accent:#E07196; --accent-2:#9E3A5C; --accent-soft:#3A1F2A; --good:#5CC79A; --good-soft:#163026; --warn:#E3B05A; --warn-soft:#352914; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151214; --surface:#1F1B1E; --fg:#F1ECEF; --muted:#A99FA5; --line:#342D32;
+  --accent:#E07196; --accent-2:#9E3A5C; --accent-soft:#3A1F2A; --good:#5CC79A; --good-soft:#163026; --warn:#E3B05A; --warn-soft:#352914; color-scheme:dark}
+:root[dir="rtl"]{--display:"IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif; --body:"IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-width:0}
+.brand span{color:var(--accent)}
+.brand small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+.lang{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:6px 12px;border-radius:999px;cursor:pointer;flex:none}
+.lang[lang="ar"]{font-family:"IBM Plex Sans Arabic", Tahoma, sans-serif}
+nav{display:flex;gap:4px;padding-bottom:10px;overflow-x:auto}
+nav button{font:inherit;font-weight:500;font-size:14px;border:0;background:none;color:var(--muted);padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+nav button[aria-selected="true"]{background:var(--accent);color:var(--surface)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:20px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.15;letter-spacing:-.02em;font-weight:700}
+[dir="rtl"] h1{letter-spacing:0;line-height:1.35}
+h2{font-size:22px;font-weight:700}
+.lede{color:var(--muted);max-width:62ch;margin:8px 0 0}
+.sample{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);background:var(--warn-soft);padding:3px 8px;border-radius:4px;margin-top:12px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:20px 0 14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:inherit;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+select{font:inherit;font-size:13px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media (min-width:760px){.grid{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.top h3{font-size:18px;line-height:1.25}
+.meta{font-size:13px;color:var(--muted);margin-top:2px}
+.save{flex:none;text-align:end;background:var(--good-soft);color:var(--good);border-radius:10px;padding:6px 10px;line-height:1.15}
+.save b{font-family:var(--display);font-size:20px;display:block}
+.save small{font-size:11px;font-weight:500}
+.save.neg{background:var(--warn-soft);color:var(--warn)}
+.label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+[dir="rtl"] .label,[dir="rtl"] .sub,[dir="rtl"] .sample{letter-spacing:0;font-size:12px}
+.ask{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.ask .v{font-family:var(--mono);font-weight:500;font-size:22px;font-variant-numeric:tabular-nums}
+.ask .then{font-size:13px;color:var(--muted);text-align:end}
+.ask .then b{font-family:var(--mono);color:var(--fg);font-weight:500}
+.track{height:10px;border-radius:5px;background:var(--line);display:flex;overflow:hidden}
+.track i{display:block;height:100%}
+.d{background:var(--accent)} .m{background:var(--accent-2)} .b{background:var(--good)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-inline-end:5px;background:var(--c)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:500;padding:3px 8px;border-radius:4px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tag.ok{color:var(--good);border-color:transparent;background:var(--good-soft)}
+.tag.pend{color:var(--warn);border-color:transparent;background:var(--warn-soft)}
+.more{font:inherit;font-size:14px;font-weight:600;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer;text-align:start}
+.ledger{border-top:1px dashed var(--line);padding-top:10px;display:grid;gap:4px}
+.row{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.row span:first-child{color:var(--muted)}
+.row span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:end}
+.row.total{border-top:1px solid var(--line);padding-top:6px;margin-top:4px;font-weight:600}
+.row.total span:first-child{color:var(--fg)}
+.fees .row span:last-child{font-family:var(--body)}
+.sub{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin-top:8px}
+.cta{font:inherit;font-weight:600;font-size:15px;background:var(--accent);color:var(--surface);border:0;border-radius:10px;padding:12px 16px;cursor:pointer}
+.note{font-size:13px;color:var(--muted)}
+.sell{display:grid;grid-template-columns:1fr;gap:18px;margin-top:20px}
+@media (min-width:860px){.sell{grid-template-columns:1fr 1fr;align-items:start}}
+form{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:14px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:grid;gap:4px;min-width:0}
+.field label{font-size:13px;font-weight:500}
+.field input,.field select{font:inherit;font-family:var(--mono);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+.field select,.field input.txt{font-family:var(--body)}
+.field input[inputmode="numeric"]{direction:ltr;text-align:start}
+[dir="rtl"] .field input[inputmode="numeric"]{text-align:right}
+.hint{font-size:12px;color:var(--muted)}
+.result{display:grid;gap:14px;min-width:0}
+.verdict{padding:12px 14px;border-radius:10px;font-size:14px;background:var(--accent-soft)}
+.toast{font-size:14px;color:var(--good);font-weight:500;margin:0}
+.steps{display:grid;gap:12px;margin-top:20px;grid-template-columns:1fr}
+@media (min-width:760px){.steps{grid-template-columns:repeat(2,1fr)}}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:12px}
+.step .n{font-family:var(--display);font-weight:700;font-size:28px;color:var(--accent);line-height:1}
+.step h3{font-size:17px;margin-bottom:4px}
+.step p{margin:0;font-size:14px;color:var(--muted)}
+.fees{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px}
+.num{font-family:var(--mono);direction:ltr;unicode-bidi:isolate}
+.drop{display:grid;gap:10px;justify-items:center;text-align:center;border:1.5px dashed var(--line);border-radius:12px;padding:20px 16px;background:var(--bg);cursor:pointer}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop b{font-size:14px;color:var(--accent)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0}
+.drop:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--line);max-width:100%}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb button{position:absolute;top:4px;inset-inline-end:4px;width:26px;height:26px;border-radius:50%;border:0;background:var(--fg);color:var(--surface);font-size:16px;line-height:1;cursor:pointer}
+.thumb .cov{position:absolute;bottom:4px;inset-inline-start:4px;font-size:10px;font-weight:600;background:var(--accent);color:var(--surface);padding:2px 6px;border-radius:4px}
+.gallery{display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;margin:-16px -16px 0;border-radius:14px 14px 0 0}
+.gallery img{flex:none;width:100%;aspect-ratio:16/10;object-fit:cover;scroll-snap-align:start;max-width:100%}
+.gcount{font-size:12px;color:var(--muted);margin-top:-6px}
+.card{position:relative}
+.budget{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;margin-top:18px}
+.budget h2{font-size:17px}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:480px){.bgrid{grid-template-columns:1fr}}
+.bres{font-size:13px;font-weight:600;color:var(--accent);margin:0}
+.bclear{font:inherit;font-size:13px;font-weight:600;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;justify-self:start;text-decoration:underline}
+.discreet{display:grid;gap:8px;background:var(--surfaceAlt,var(--bg));border:1px dashed var(--accent-2);border-radius:10px;padding:12px 14px;font-size:14px}
+.discreet b{color:var(--accent)}
+.lock{display:inline-block;width:12px;height:12px;border:2px solid currentColor;border-radius:3px;position:relative;margin-inline-end:6px;vertical-align:-1px}
+.lock::before{content:"";position:absolute;width:6px;height:6px;border:2px solid currentColor;border-bottom:0;border-radius:4px 4px 0 0;left:1px;top:-8px}
+.ghost{font:inherit;font-weight:600;font-size:14px;color:var(--accent);background:var(--accent-soft);border:0;border-radius:8px;padding:10px 12px;cursor:pointer;justify-self:start}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{width:20px;height:20px;accent-color:var(--accent);flex:none;margin-top:1px}
+.opts{display:grid;gap:10px}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+.opt.best{border-color:var(--good);box-shadow:inset 0 0 0 1px var(--good)}
+.opt .oh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.opt h3{font-size:15px}
+.opt .amt{font-family:var(--mono);font-weight:500;font-size:18px}
+.opt.bad .amt{color:var(--warn)}
+.opt p{margin:0;font-size:13px;color:var(--muted)}
+.pill{font-size:11px;font-weight:700;color:var(--good);background:var(--good-soft);padding:2px 8px;border-radius:999px}
+.devs ul{margin:0;padding-inline-start:20px;display:grid;gap:6px;color:var(--muted);font-size:14px}
+.faq{margin-top:20px;display:grid;gap:8px}
+.faq details{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.faq summary{cursor:pointer;font-weight:600;font-size:15px}
+.faq p{margin:8px 0 0;color:var(--muted);font-size:14px}
+.gtag{position:absolute;top:10px;inset-inline-start:10px;font-size:11px;font-weight:600;letter-spacing:.03em;color:#fff;background:rgba(20,12,16,.62);padding:4px 8px;border-radius:999px;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}.card:hover{border-color:var(--accent-2)}}
+</style>
+</head>
+<body>
+
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><span data-t="brand">Tanazul</span><small data-t="tag">Off-plan resale · Qatar</small></div>
+      <button class="lang" id="lang" type="button" lang="ar">العربية</button>
+    </div>
+    <nav role="tablist" aria-label="Sections">
+      <button role="tab" id="t-buy" aria-selected="true" data-tab="buy" data-t="tabBuy">Buy a unit</button>
+      <button role="tab" id="t-sell" aria-selected="false" data-tab="sell" data-t="tabSell">Sell my unit</button>
+      <button role="tab" id="t-how" aria-selected="false" data-tab="how" data-t="tabHow">How it works</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="buy">
+    <h1 data-t="buyH">Off-plan units at last-cycle prices.</h1>
+    <p class="lede" data-t="buyL">Every listing shows what the seller paid, what is still owed, and what the same unit costs from a developer today. You pay the seller for their equity and take over the remaining installments.</p>
+    <span class="sample" data-t="sample">Example listings · prototype data</span>
+    <div class="budget">
+      <h2 data-t="bTitle">Match my budget</h2>
+      <div class="bgrid">
+        <div class="field"><label for="b-cash" data-t="bCash">Cash I can pay the seller (QAR)</label><input id="b-cash" inputmode="numeric" placeholder="600,000"></div>
+        <div class="field"><label for="b-mon" data-t="bMon">Monthly installment I can afford (QAR)</label><input id="b-mon" inputmode="numeric" placeholder="15,000"></div>
+      </div>
+      <p class="bres" id="b-res" hidden></p>
+      <button class="bclear" id="b-clear" type="button" hidden data-t="bClear">Clear budget</button>
+    </div>
+    <div class="tools">
+      <div class="chips" id="areas"></div>
+      <select id="sort" aria-label="Sort">
+        <option value="save" data-t="sSave">Biggest saving</option>
+        <option value="cash" data-t="sCash">Lowest cash today</option>
+        <option value="hand" data-t="sHand">Soonest handover</option>
+      </select>
+    </div>
+    <div class="grid" id="list"></div>
+  </section>
+
+  <section id="sell" hidden>
+    <h1 data-t="sellH">Price your unit from your payment record.</h1>
+    <p class="lede" data-t="sellL">Enter your contract numbers. We work out what you have paid, what the buyer takes over, and whether your asking price still leaves the buyer a reason to choose you over a new launch.</p>
+    <div class="sell">
+      <form id="sf" novalidate>
+        <div class="f2">
+          <div class="field"><label for="s-area" data-t="fArea">Area</label>
+            <select id="s-area"><option value="Lusail">Lusail</option><option value="The Pearl">The Pearl</option><option value="Qetaifan Island">Qetaifan Island</option><option value="Other">Other</option></select></div>
+          <div class="field"><label for="s-type" data-t="fUnit">Unit</label>
+            <select id="s-type"><option value="Studio">Studio</option><option value="1 bedroom" selected>1 bedroom</option><option value="2 bedrooms">2 bedrooms</option><option value="3 bedrooms">3 bedrooms</option><option value="Villa">Villa</option></select></div>
+        </div>
+        <div class="field"><label for="s-price" data-t="fPrice">Original contract price (QAR)</label><input id="s-price" inputmode="numeric" value="1,150,000"></div>
+        <div class="f2">
+          <div class="field"><label for="s-down" data-t="fDown">Down payment (QAR)</label><input id="s-down" inputmode="numeric" value="230,000"></div>
+          <div class="field"><label for="s-mon" data-t="fMon">Monthly installment</label><input id="s-mon" inputmode="numeric" value="12,000"></div>
+        </div>
+        <div class="f2">
+          <div class="field"><label for="s-paid" data-t="fPaid">Installments paid</label><input id="s-paid" inputmode="numeric" value="30"></div>
+          <div class="field"><label for="s-total" data-t="fTotal">Total installments</label><input id="s-total" inputmode="numeric" value="48"></div>
+        </div>
+        <div class="field"><label for="s-mkt" data-t="fMkt">Today's price for a similar new unit (QAR)</label><input id="s-mkt" inputmode="numeric" value="1,480,000"><span class="hint" data-t="hMkt">Check current developer launches in the same area and size.</span></div>
+        <div class="field"><label for="s-ask" data-t="fAsk">Your asking price (QAR)</label><input id="s-ask" inputmode="numeric" value="560,000"><span class="hint" data-t="hAsk">This is what the buyer pays you. The remaining balance moves to them.</span></div>
+        <div class="f2">
+          <div class="field"><label for="s-fin" data-t="fFin">Paid through</label>
+            <select id="s-fin"><option value="Developer plan">Developer plan</option><option value="Bank finance">Bank finance</option></select></div>
+          <div class="field"><label for="s-hand" data-t="fHand">Expected handover</label><input id="s-hand" class="txt" value="Q2 2027"></div>
+        </div>
+        <div class="field"><label for="s-pen" data-t="fPen">Cancellation deduction in your contract (%)</label><input id="s-pen" inputmode="numeric" value="10"><span class="hint" data-t="hPen">What the developer keeps if you cancel. Check your contract; it varies by project.</span></div>
+        <label class="check" for="s-disc"><input type="checkbox" id="s-disc"><span><b data-t="fDisc">List discreetly</b><br><span class="hint" data-t="hDisc">Hide the project name and photos. Only verified buyers you approve see the details.</span></span></label>
+        <div class="field">
+          <span style="font-size:13px;font-weight:500" data-t="fPhotos">Property photos</span>
+          <label class="drop" id="drop" for="s-photos">
+            <input type="file" id="s-photos" accept="image/*" multiple>
+            <b data-t="addPh">Add photos</b>
+            <span class="hint" data-t="hPhotos">Tap to choose or drag images here. Up to 10. The first photo is the cover.</span>
+          </label>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+        <button class="cta" type="submit" data-t="submit">Submit for verification</button>
+        <p class="toast" id="toast" hidden data-t="toast">Saved as a draft. In the live version, we request your payment statement from the developer or bank before the listing goes public.</p>
+      </form>
+      <div class="result">
+        <div class="verdict" id="verdict"></div>
+        <div>
+          <p class="label" style="margin:0 0 8px" data-t="optsH">Your exit options</p>
+          <div class="opts" id="opts"></div>
+        </div>
+        <div>
+          <p class="label" style="margin:0 0 8px" data-t="preview">How buyers will see it</p>
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" hidden>
+    <h1 data-t="howH">One transfer, checked at every step.</h1>
+    <p class="lede" data-t="howL">An off-plan resale is a contract assignment (tanazul). The buyer steps into the seller's contract with the developer, so the developer and any lending bank have to approve it.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><div><h3 data-t="s1h">Seller lists the contract</h3><p data-t="s1p">Original price, down payment, installments paid and left, handover date, and an asking price for the equity.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h3 data-t="s2h">We verify the payment record</h3><p data-t="s2p">The developer or bank confirms the statement. Verified listings carry a badge, and the numbers cannot be edited afterwards.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h3 data-t="s3h">Developer issues the NOC</h3><p data-t="s3p">The No Objection Certificate approves the transfer. Bank-financed units also need the bank to agree to transfer or settle the loan.</p></div></div>
+      <div class="step"><div class="n">4</div><div><h3 data-t="s4h">Escrow closes the deal</h3><p data-t="s4p">The buyer's payment sits in escrow until the developer registers the new owner, then it releases to the seller.</p></div></div>
+    </div>
+    <div class="fees">
+      <h2 data-t="feesH">How the platform earns</h2>
+      <div class="row"><span data-t="fe1">Listing (seller)</span><span data-t="fe1v">Free for 6 months, then QR 100</span></div>
+      <div class="row"><span data-t="fe2">Seller success fee</span><span data-t="fe2v">1.5% of property value, on closing</span></div>
+      <div class="row"><span data-t="fe3">Buyer success fee</span><span data-t="fe3v">1.5% of property value, on closing</span></div>
+      <p class="note" style="margin:6px 0 0" data-t="feesN">Developer transfer fees and minimum-paid rules vary by project and are shown on each listing once confirmed.</p>
+    </div>
+    <div class="fees devs">
+      <h2 data-t="devH">For developers</h2>
+      <ul>
+        <li data-t="dev1">Defaulted units become paying contracts again, without a cancellation.</li>
+        <li data-t="dev2">Verified buyers ready to take over the remaining installments.</li>
+        <li data-t="dev3">Fewer bounced cheques, legal cases and units to resell.</li>
+        <li data-t="dev4">Confirm payment records and issue NOCs from one dashboard.</li>
+      </ul>
+    </div>
+    <div class="faq">
+      <h2 data-t="faqH">Questions</h2>
+      <details><summary data-t="q1">Is transferring an off-plan contract allowed?</summary><p data-t="a1">Most developers allow a transfer with their No Objection Certificate. Some require a minimum share of the price to be paid first and charge a transfer fee. Each listing shows the developer's rules once confirmed.</p></details>
+      <details><summary data-t="q2">Who can see my listing?</summary><p data-t="a2">Public listings are visible to everyone. Discreet listings hide the project name and photos until you approve a verified buyer.</p></details>
+      <details><summary data-t="q3">What if my unit is bank-financed?</summary><p data-t="a3">The bank must approve the transfer, or the loan is settled at closing from the buyer's payment.</p></details>
+      <details><summary data-t="q4">When do I get my money?</summary><p data-t="a4">The buyer's payment is held in escrow and released to you once the developer registers the new owner.</p></details>
+      <details><summary data-t="q5">Can I change my mind?</summary><p data-t="a5">Yes. You can withdraw your listing at any time before a buyer is confirmed.</p></details>
+    </div>
+  </section>
+</main>
+
+<script>
+const T={
+ en:{},
+ ar:{brand:"تنازل",tag:"إعادة بيع العقارات على الخارطة · قطر",tabBuy:"شراء وحدة",tabSell:"بيع وحدتي",tabHow:"كيف تعمل المنصة",
+  buyH:"وحدات على الخارطة بأسعار الدورة السابقة.",
+  buyL:"يعرض كل إعلان ما دفعه البائع، والمبلغ المتبقي، وسعر الوحدة نفسها من المطور اليوم. تدفع للبائع قيمة ما سدده، وتكمل أنت الأقساط المتبقية.",
+  sample:"إعلانات تجريبية · بيانات نموذجية",sSave:"أعلى توفير",sCash:"أقل دفعة نقدية اليوم",sHand:"أقرب موعد تسليم",
+  sellH:"سعّر وحدتك بناءً على سجل دفعاتك.",
+  sellL:"أدخل أرقام عقدك. نحسب ما دفعته، وما سينتقل إلى المشتري، وهل يترك سعرك للمشتري سبباً لاختيار وحدتك بدلاً من مشروع جديد.",
+  fArea:"المنطقة",fUnit:"الوحدة",fPrice:"سعر العقد الأصلي (ر.ق)",fDown:"الدفعة المقدمة (ر.ق)",fMon:"القسط الشهري",fPaid:"الأقساط المدفوعة",fTotal:"إجمالي الأقساط",
+  fMkt:"سعر وحدة جديدة مماثلة اليوم (ر.ق)",hMkt:"راجع أسعار المشاريع الجديدة في المنطقة نفسها وبالمساحة نفسها.",
+  fAsk:"السعر المطلوب (ر.ق)",hAsk:"هذا ما يدفعه المشتري لك، وينتقل إليه الرصيد المتبقي.",fFin:"طريقة السداد",fHand:"موعد التسليم المتوقع",
+  fPhotos:"صور العقار",addPh:"إضافة صور",hPhotos:"اضغط للاختيار أو اسحب الصور هنا. حتى 10 صور، والصورة الأولى هي الغلاف.",
+  submit:"إرسال للتحقق",toast:"تم الحفظ كمسودة. في النسخة الفعلية، نطلب كشف دفعاتك من المطور أو البنك قبل نشر الإعلان.",preview:"كيف سيراها المشتري",
+  howH:"تنازل واحد، مُدقَّق في كل خطوة.",
+  howL:"إعادة بيع الوحدة على الخارطة هي تنازل عن العقد. يحل المشتري محل البائع في عقده مع المطور، لذلك يجب أن يوافق المطور وأي بنك ممول.",
+  s1h:"البائع يعرض عقده",s1p:"السعر الأصلي، والدفعة المقدمة، والأقساط المدفوعة والمتبقية، وموعد التسليم، والسعر المطلوب مقابل ما سدده.",
+  s2h:"نتحقق من سجل الدفعات",s2p:"يؤكد المطور أو البنك كشف الحساب. تحمل الإعلانات الموثقة شارة، ولا يمكن تعديل أرقامها بعد ذلك.",
+  s3h:"المطور يصدر عدم الممانعة",s3p:"شهادة عدم الممانعة توافق على التنازل. الوحدات الممولة بنكياً تحتاج أيضاً موافقة البنك على نقل التمويل أو تسويته.",
+  s4h:"حساب الضمان يُغلق الصفقة",s4p:"يبقى مبلغ المشتري في حساب ضمان حتى يسجل المطور المالك الجديد، ثم يُحوَّل إلى البائع.",
+  feesH:"كيف تربح المنصة",fe1:"الإعلان (البائع)",fe1v:"مجاني لمدة 6 أشهر، ثم 100 ر.ق",fe2:"رسوم نجاح البائع",fe2v:"1.5% من قيمة العقار عند الإغلاق",fe3:"رسوم نجاح المشتري",fe3v:"1.5% من قيمة العقار عند الإغلاق",
+  bTitle:"ابحث حسب ميزانيتك",bCash:"المبلغ النقدي الذي أستطيع دفعه للبائع (ر.ق)",bMon:"القسط الشهري الذي أستطيع تحمله (ر.ق)",bClear:"مسح الميزانية",
+  fPen:"نسبة الخصم عند الإلغاء في عقدك (%)",hPen:"ما يحتفظ به المطور إذا ألغيت العقد. راجع عقدك، فهي تختلف حسب المشروع.",
+  fDisc:"إعلان سري",hDisc:"إخفاء اسم المشروع والصور. لا يرى التفاصيل إلا المشترون الموثقون الذين توافق عليهم.",
+  optsH:"خياراتك للخروج",
+  devH:"للمطورين",dev1:"الوحدات المتعثرة تعود عقوداً منتظمة السداد دون إلغاء.",dev2:"مشترون موثقون مستعدون لإكمال الأقساط المتبقية.",dev3:"شيكات مرتجعة وقضايا ووحدات معادة للبيع أقل.",dev4:"تأكيد سجلات الدفع وإصدار شهادات عدم الممانعة من لوحة واحدة.",
+  faqH:"أسئلة شائعة",
+  q1:"هل يُسمح بالتنازل عن عقد على الخارطة؟",a1:"يسمح معظم المطورين بالتنازل بموجب شهادة عدم ممانعة. يشترط بعضهم سداد نسبة دنيا من السعر أولاً ويفرض رسوم تنازل. تظهر شروط المطور في كل إعلان بعد تأكيدها.",
+  q2:"من يستطيع رؤية إعلاني؟",a2:"الإعلانات العامة متاحة للجميع. الإعلانات السرية تخفي اسم المشروع والصور حتى توافق على مشترٍ موثق.",
+  q3:"ماذا لو كانت وحدتي ممولة من بنك؟",a3:"يجب أن يوافق البنك على التنازل، أو يُسدَّد التمويل عند الإغلاق من دفعة المشتري.",
+  q4:"متى أستلم أموالي؟",a4:"تبقى دفعة المشتري في حساب ضمان، وتُحوَّل إليك بعد أن يسجل المطور المالك الجديد.",
+  q5:"هل يمكنني التراجع؟",a5:"نعم. يمكنك سحب إعلانك في أي وقت قبل تأكيد المشتري.",
+  feesN:"تختلف رسوم التنازل وشروط الحد الأدنى للسداد حسب المشروع، وتظهر في كل إعلان بعد تأكيدها."}
+};
+const W={ // dynamic words
+ en:{All:"All",Lusail:"Lusail","The Pearl":"The Pearl","Qetaifan Island":"Qetaifan Island",Other:"Other",Studio:"Studio","1 bedroom":"1 bedroom","2 bedrooms":"2 bedrooms","3 bedrooms":"3 bedrooms",Villa:"Villa","Villa, 3 bedrooms":"Villa, 3 bedrooms",
+  "Developer plan":"Developer plan","Bank finance":"Bank finance",under:"under new price",over:"over new price",pay:"Pay seller today",
+  then:(m,n)=>`then <b>${m}</b>/mo × ${n}`,ball:b=>`+ <b>${b}</b> at handover`,down:"Down",inst:"Installments",left:"Left",
+  built:(b,h)=>`Construction ${b}% · handover ${h}`,nobuilt:h=>`Handover ${h} · construction progress added after verification`,
+  ver:"Payments verified",verP:"Verification pending",noc:"NOC approved",nocP:"NOC requested",show:"See the full numbers",hide:"Hide the numbers",
+  orig:"Original contract",cp:"Contract price",dp:"Down payment",ip:(n,m)=>`Installments paid (${n} × ${m})`,sp:"Seller has paid",
+  wyp:"What you pay",tsn:"To the seller now",ri:(n,m)=>`Remaining installments (${n} × ${m})`,dah:"Due at handover",ytc:"Your total cost",
+  cmp:"Compared with buying new",snu:"Similar new unit today",ys:"You save",ype:"You pay extra",
+  prem:(up,x)=>`Seller's asking price is ${x} ${up?"above":"below"} what they paid. Developer transfer fee not included.`,
+  your:"Your unit",qar:n=>"QAR "+n,
+  vPaid:(a,b)=>`You have paid <b>${a}</b>. The buyer takes over <b>${b}</b>. `,
+  vNeg:x=>`At this price the buyer pays more than a new unit. Keep your ask below <b>${x}</b>.`,
+  vThin:s=>`The buyer saves ${s}%. That's thin; most buyers will want 15–25% under new launch prices.`,
+  vGood:s=>`The buyer saves <b>${s}%</b> against a new unit, which is a strong offer.`,
+  vBank:" Since your unit is bank-financed, the bank must approve the transfer or the loan must be settled at closing.",
+  e1:"Check your numbers: the amount paid can't be more than the contract price.",e2:"Installments paid can't be more than total installments.",
+  cover:"Cover",rm:"Remove photo",nph:n=>`${n} photo${n>1?"s":""} · swipe to see more`,max:"You can add up to 10 photos.",
+  bRes:(n,t)=>n?`${n} of ${t} listings fit your budget.`:`No listings fit yet. Try more cash or a higher monthly amount.`,
+  dName:a=>`Private listing in ${a}`,dTag:"Discreet listing",dBody:"The project name and photos are shared with verified buyers after the seller approves.",
+  dReq:"Request details",dSent:"Request sent. In the live app, the seller approves and we share the details after you verify your ID.",
+  oT:"Sell on Tanazul",oTp:f=>`After the 1.5% fee (${f}). The buyer takes over every remaining installment and cheque.`,
+  oC:"Cancel with the developer",oCp:p=>`Estimate with a ${p}% deduction. The amount and timing depend on your contract.`,
+  oS:"Stop paying",oSa:"At risk",oSp:"Bounced cheques can lead to a court case and a travel ban, and the developer may cancel the contract.",best:"Best option"},
+ ar:{All:"الكل",Lusail:"لوسيل","The Pearl":"اللؤلؤة","Qetaifan Island":"جزيرة قطيفان",Other:"أخرى",Studio:"استوديو","1 bedroom":"غرفة نوم واحدة","2 bedrooms":"غرفتا نوم","3 bedrooms":"3 غرف نوم",Villa:"فيلا","Villa, 3 bedrooms":"فيلا، 3 غرف نوم",
+  "Developer plan":"خطة المطور","Bank finance":"تمويل بنكي",under:"أقل من سعر الجديد",over:"أعلى من سعر الجديد",pay:"تدفع للبائع اليوم",
+  then:(m,n)=>`ثم <b>${m}</b> شهرياً × ${n}`,ball:b=>`+ <b>${b}</b> عند التسليم`,down:"المقدم",inst:"الأقساط",left:"المتبقي",
+  built:(b,h)=>`نسبة الإنجاز ${b}% · التسليم ${h}`,nobuilt:h=>`التسليم ${h} · تُضاف نسبة الإنجاز بعد التحقق`,
+  ver:"الدفعات موثقة",verP:"التحقق قيد الإجراء",noc:"عدم الممانعة صادرة",nocP:"تم طلب عدم الممانعة",show:"عرض كل الأرقام",hide:"إخفاء الأرقام",
+  orig:"العقد الأصلي",cp:"سعر العقد",dp:"الدفعة المقدمة",ip:(n,m)=>`الأقساط المدفوعة (${n} × ${m})`,sp:"إجمالي ما دفعه البائع",
+  wyp:"ما تدفعه أنت",tsn:"للبائع الآن",ri:(n,m)=>`الأقساط المتبقية (${n} × ${m})`,dah:"مستحق عند التسليم",ytc:"التكلفة الإجمالية عليك",
+  cmp:"مقارنة بالشراء الجديد",snu:"وحدة جديدة مماثلة اليوم",ys:"توفيرك",ype:"تدفع زيادة",
+  prem:(up,x)=>`السعر المطلوب ${up?"أعلى":"أقل"} مما دفعه البائع بمبلغ ${x}. رسوم التنازل لدى المطور غير مشمولة.`,
+  your:"وحدتك",qar:n=>`<span class="num">${n}</span> ر.ق`,
+  vPaid:(a,b)=>`دفعت <b>${a}</b>، وينتقل إلى المشتري <b>${b}</b>. `,
+  vNeg:x=>`بهذا السعر يدفع المشتري أكثر من سعر وحدة جديدة. اجعل سعرك أقل من <b>${x}</b>.`,
+  vThin:s=>`يوفر المشتري ${s}% فقط، وهذا قليل. معظم المشترين يتوقعون توفيراً بين 15 و25% مقارنة بأسعار المشاريع الجديدة.`,
+  vGood:s=>`يوفر المشتري <b>${s}%</b> مقارنة بوحدة جديدة، وهذا عرض قوي.`,
+  vBank:" بما أن وحدتك ممولة من بنك، يجب أن يوافق البنك على التنازل أو أن يُسدَّد التمويل عند الإغلاق.",
+  e1:"تحقق من أرقامك: لا يمكن أن يتجاوز المبلغ المدفوع سعر العقد.",e2:"لا يمكن أن تتجاوز الأقساط المدفوعة إجمالي الأقساط.",
+  cover:"الغلاف",rm:"حذف الصورة",nph:n=>`عدد الصور: ${n} · اسحب لرؤية المزيد`,max:"يمكنك إضافة 10 صور كحد أقصى.",
+  bRes:(n,t)=>n?`${n} من ${t} إعلانات تناسب ميزانيتك.`:`لا توجد إعلانات مناسبة بعد. جرّب مبلغاً نقدياً أكبر أو قسطاً شهرياً أعلى.`,
+  dName:a=>`إعلان سري في ${a}`,dTag:"إعلان سري",dBody:"يُشارَك اسم المشروع والصور مع المشترين الموثقين بعد موافقة البائع.",
+  dReq:"طلب التفاصيل",dSent:"تم إرسال الطلب. في النسخة الفعلية، يوافق البائع ونشارك التفاصيل بعد التحقق من هويتك.",
+  oT:"البيع عبر تنازل",oTp:f=>`بعد خصم رسوم 1.5% (${f}). يتولى المشتري جميع الأقساط والشيكات المتبقية.`,
+  oC:"الإلغاء مع المطور",oCp:p=>`تقدير بخصم ${p}%. يعتمد المبلغ وموعده على عقدك.`,
+  oS:"التوقف عن السداد",oSa:"معرّض للخطر",oSp:"الشيكات المرتجعة قد تؤدي إلى قضية ومنع من السفر، وقد يلغي المطور العقد.",best:"أفضل خيار"}
+};
+const L=[
+ {id:1,name:"Marina Crest Tower",ar:"برج مارينا كرست",area:"Lusail",type:"1 bedroom",sqm:78,price:1150000,down:230000,mon:12000,paid:30,total:48,hand:"Q2 2027",handAr:"الربع الثاني 2027",ho:2027.25,built:72,fin:"Developer plan",ask:560000,mkt:1480000,ver:true,noc:true},
+ {id:2,name:"Gewan Bay Residences",ar:"مساكن خليج جيوان",area:"The Pearl",type:"2 bedrooms",sqm:128,price:2400000,down:480000,mon:25000,paid:28,total:48,hand:"Q4 2027",handAr:"الربع الرابع 2027",ho:2027.75,built:58,fin:"Bank finance",ask:1250000,mkt:3350000,ver:true,noc:false},
+ {id:3,name:"Fox Hills Studios",ar:"استوديوهات فوكس هيلز",area:"Lusail",type:"Studio",sqm:52,price:690000,down:138000,mon:7500,paid:22,total:42,hand:"Q1 2027",handAr:"الربع الأول 2027",ho:2027,built:81,fin:"Developer plan",ask:290000,mkt:860000,ver:true,noc:true},
+ {id:4,name:"North Island Villas",ar:"فلل الجزيرة الشمالية",area:"Qetaifan Island",type:"Villa, 3 bedrooms",sqm:310,price:6200000,down:1240000,mon:60000,paid:18,total:60,hand:"Q3 2028",handAr:"الربع الثالث 2028",ho:2028.5,built:34,fin:"Developer plan",ask:2450000,mkt:8100000,ver:false,noc:false},
+ {id:5,name:"Waterfront Terraces",ar:"شرفات الواجهة البحرية",area:"Lusail",type:"2 bedrooms",sqm:112,price:1780000,down:356000,mon:18000,paid:36,total:48,hand:"Q1 2027",handAr:"الربع الأول 2027",ho:2027,built:88,fin:"Bank finance",ask:940000,mkt:2250000,ver:true,noc:true,discreet:true}
+];
+// ---- Illustrated example photos, drawn on canvas (no third-party images) ----
+const SCENES={1:["skyline-dusk","interior-dusk","tower-night"],2:["marina-day","interior-day","tower-day"],3:["tower-day","interior-day"],4:["villa-day","villa-dusk","interior-dusk"],5:["skyline-dusk","interior-day","marina-night"]};
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const SKY={day:["#7FB6E6","#CFE6F5","#F3E9D8"],dusk:["#2B2350","#C0567A","#F6B26B"],night:["#0B1026","#1C2A55","#3A3F6B"]};
+function sky(g,w,h,t,r){const s=SKY[t],gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,s[0]);gr.addColorStop(.6,s[1]);gr.addColorStop(1,s[2]);g.fillStyle=gr;g.fillRect(0,0,w,h);
+  if(t==="night"){g.fillStyle="rgba(255,255,255,.8)";for(let i=0;i<60;i++){g.fillRect(r()*w,r()*h*.5,1.2,1.2)}g.fillStyle="#F4F1E1";g.beginPath();g.arc(w*.8,h*.18,h*.05,0,7);g.fill()}
+  else{const sx=t==="day"?w*.8:w*.3,sy=t==="day"?h*.18:h*.62,sg=g.createRadialGradient(sx,sy,0,sx,sy,h*.35);sg.addColorStop(0,t==="day"?"rgba(255,250,230,.95)":"rgba(255,214,150,.95)");sg.addColorStop(1,"rgba(255,220,170,0)");g.fillStyle=sg;g.fillRect(0,0,w,h)}}
+function towers(g,w,base,t,r,n,maxH,scale){const out=[];let x=-10;while(x<w){const tw=(28+r()*60)*scale,th=(maxH*(.35+r()*.65)),gap=(4+r()*14)*scale;out.push([x,tw,th]);x+=tw+gap}
+  out.forEach(([x,tw,th],i)=>{const shade=t==="day"?`hsl(${205+r()*20},${12+r()*12}%,${52+r()*18}%)`:t==="dusk"?`hsl(${330+r()*30},${18+r()*10}%,${22+r()*12}%)`:`hsl(${225+r()*15},${25}%,${12+r()*8}%)`;
+    g.fillStyle=shade;g.beginPath();const tip=r()<.3?th*.12:0;g.moveTo(x,base);g.lineTo(x,base-th+tip);g.lineTo(x+tw/2,base-th);g.lineTo(x+tw,base-th+tip);g.lineTo(x+tw,base);g.fill();
+    const cols=Math.max(2,Math.floor(tw/(9*scale))),rows=Math.floor((th-tip)/(11*scale));for(let c=0;c<cols;c++)for(let k=1;k<rows;k++){const lit=t==="day"?r()<.5:r()<(t==="night"?.45:.3);
+      g.fillStyle=t==="day"?(lit?"rgba(255,255,255,.35)":"rgba(40,70,100,.25)"):(lit?`rgba(255,${200+r()*40|0},${120+r()*60|0},.9)`:"rgba(0,0,0,.25)");g.fillRect(x+3*scale+c*(tw-6*scale)/cols,base-th+tip+k*11*scale,(tw-6*scale)/cols-2*scale,5*scale)}});return out}
+function water(g,w,y,h,t){const gr=g.createLinearGradient(0,y,0,y+h);const c=t==="day"?["#5E9CC8","#2E6E9A"]:t==="dusk"?["#7A3E63","#2B2350"]:["#16224A","#070B1C"];gr.addColorStop(0,c[0]);gr.addColorStop(1,c[1]);g.fillStyle=gr;g.fillRect(0,y,w,h);
+  g.globalAlpha=.25;g.save();g.translate(0,2*y);g.scale(1,-1);g.drawImage(g.canvas,0,y-h,w,h,0,y-h,w,h);g.restore();g.globalAlpha=1;
+  g.fillStyle=t==="day"?"rgba(255,255,255,.25)":"rgba(255,210,160,.18)";for(let i=0;i<40;i++){g.fillRect(Math.random()*w,y+Math.random()*h,20+Math.random()*40,1.5)}}
+function palm(g,x,base,hgt,col){g.strokeStyle=col;g.lineWidth=hgt*.05;g.lineCap="round";g.beginPath();g.moveTo(x,base);g.quadraticCurveTo(x+hgt*.12,base-hgt*.5,x+hgt*.05,base-hgt);g.stroke();
+  const tx=x+hgt*.05,ty=base-hgt;g.lineWidth=hgt*.035;for(let a=0;a<9;a++){const ang=-Math.PI+a*(Math.PI/8)+.1,len=hgt*(.45+.1*(a%2));g.beginPath();g.moveTo(tx,ty);g.quadraticCurveTo(tx+Math.cos(ang)*len*.6,ty+Math.sin(ang)*len*.6-hgt*.12,tx+Math.cos(ang)*len,ty+Math.sin(ang)*len+hgt*.15);g.stroke()}}
+function paintSkyline(g,w,h,t,r,{withWater=true,palms=true}={}){sky(g,w,h,t,r);const base=withWater?h*.68:h*.9;
+  towers(g,w,base,t==="day"?"day":t,r,0,h*.32,.9);towers(g,w,base,t,r,0,h*.5,1.3);
+  if(withWater)water(g,w,base,h-base,t);
+  g.fillStyle=t==="day"?"#C9B48F":"#2A1B22";g.fillRect(0,h*.9,w,h*.1);
+  if(palms){const pc=t==="day"?"#3E5B34":"#140C12";palm(g,w*.08,h*.93,h*.42,pc);palm(g,w*.92,h*.94,h*.36,pc)}}
+function paintTower(g,w,h,t,r){sky(g,w,h,t,r);towers(g,w,h*.86,t,r,0,h*.35,.8);
+  const tx=w*.34,tw=w*.32,top=h*.06,base=h*.88;const gr=g.createLinearGradient(tx,0,tx+tw,0);
+  const c=t==="day"?["#9DB8CC","#E8F1F7","#7E9BB0"]:t==="dusk"?["#5A2F48","#C77C8E","#3A2036"]:["#1A2148","#36407A","#121633"];gr.addColorStop(0,c[0]);gr.addColorStop(.5,c[1]);gr.addColorStop(1,c[2]);
+  g.fillStyle=gr;g.beginPath();g.moveTo(tx,base);g.lineTo(tx+tw*.08,top+h*.05);g.quadraticCurveTo(tx+tw/2,top-h*.02,tx+tw*.92,top+h*.05);g.lineTo(tx+tw,base);g.fill();
+  for(let k=0;k<34;k++){const y=top+h*.07+k*((base-top-h*.07)/34);g.fillStyle=t==="day"?"rgba(255,255,255,.28)":`rgba(255,${190+r()*50|0},130,${.35+r()*.5})`;g.fillRect(tx+tw*.1,y,tw*.8,(base-top)/34*.45);
+    if(k%4===0){g.fillStyle="rgba(255,255,255,.5)";g.fillRect(tx+tw*.06,y-2,tw*.88,2)}}
+  g.fillStyle=t==="day"?"#D7C7A6":"#24171D";g.fillRect(0,h*.88,w,h*.12);const pc=t==="day"?"#3E5B34":"#140C12";palm(g,w*.18,h*.95,h*.34,pc);palm(g,w*.82,h*.96,h*.3,pc)}
+function paintInterior(g,w,h,t,r){const wy=h*.08,wh=h*.56,wx=w*.06,ww=w*.88;
+  g.fillStyle=t==="day"?"#EFE7DC":"#3A2C2E";g.fillRect(0,0,w,h);
+  g.save();g.beginPath();g.rect(wx,wy,ww,wh);g.clip();g.translate(wx,wy);paintSkyline(g,ww,wh*1.15,t==="day"?"day":t,r,{palms:false});g.restore();
+  g.fillStyle=t==="day"?"#F7F2EA":"#4A3A3B";for(let i=0;i<=4;i++)g.fillRect(wx+i*ww/4-3,wy,6,wh);g.fillRect(wx,wy-4,ww,8);g.fillRect(wx,wy+wh-4,ww,8);
+  const fl=g.createLinearGradient(0,wy+wh,0,h);fl.addColorStop(0,t==="day"?"#C9A27A":"#5A3E2E");fl.addColorStop(1,t==="day"?"#9C774F":"#2E1F18");g.fillStyle=fl;g.fillRect(0,wy+wh,w,h-wy-wh);
+  g.fillStyle=t==="day"?"rgba(255,255,255,.18)":"rgba(255,200,150,.08)";g.beginPath();g.moveTo(wx,wy+wh);g.lineTo(wx+ww,wy+wh);g.lineTo(w*.98,h);g.lineTo(w*.02,h);g.fill();
+  g.fillStyle=t==="day"?"#E9DCC8":"#6B5550";g.beginPath();g.ellipse(w*.5,h*.9,w*.32,h*.06,0,0,7);g.fill();
+  const sofa=t==="day"?"#8A1538":"#7A2340";g.fillStyle=sofa;g.fillRect(w*.22,h*.7,w*.56,h*.12);g.fillRect(w*.2,h*.66,w*.06,h*.16);g.fillRect(w*.74,h*.66,w*.06,h*.16);
+  g.fillStyle="rgba(0,0,0,.18)";g.fillRect(w*.22,h*.7,w*.56,h*.03);
+  g.fillStyle=t==="day"?"#F2C9A0":"#E8A87C";[[.32,.68],[.45,.68],[.58,.68]].forEach(([x,y])=>{g.fillRect(w*x,h*y,w*.09,h*.05)});
+  g.fillStyle="#2F4A2A";g.beginPath();g.ellipse(w*.88,h*.62,w*.05,h*.1,0,0,7);g.fill();g.fillStyle="#B98B5E";g.fillRect(w*.86,h*.68,w*.04,h*.1);
+  if(t!=="day"){const lg=g.createRadialGradient(w*.12,h*.6,0,w*.12,h*.6,h*.4);lg.addColorStop(0,"rgba(255,200,120,.45)");lg.addColorStop(1,"rgba(255,200,120,0)");g.fillStyle=lg;g.fillRect(0,0,w,h);g.fillStyle="#E7C38C";g.fillRect(w*.1,h*.48,w*.05,h*.05);g.fillStyle="#3A2C2E";g.fillRect(w*.122,h*.53,w*.006,h*.28)}}
+function paintVilla(g,w,h,t,r){sky(g,w,h,t,r);g.fillStyle=t==="day"?"#6F8F55":"#2D3524";g.fillRect(0,h*.62,w,h*.38);
+  const vx=w*.18,vw=w*.64,wall=t==="day"?"#F5F0E6":"#D9C7BC",glass=t==="day"?"#8FB6CF":"#F2B66C";
+  g.fillStyle=wall;g.fillRect(vx,h*.38,vw*.6,h*.26);g.fillRect(vx+vw*.35,h*.24,vw*.65,h*.4);g.fillStyle="rgba(0,0,0,.12)";g.fillRect(vx+vw*.35,h*.24,vw*.65,h*.02);g.fillRect(vx,h*.38,vw*.6,h*.015);
+  g.fillStyle=glass;g.fillRect(vx+vw*.05,h*.44,vw*.25,h*.17);g.fillRect(vx+vw*.42,h*.3,vw*.5,h*.12);g.fillRect(vx+vw*.66,h*.46,vw*.28,h*.15);
+  g.fillStyle="rgba(255,255,255,.35)";for(let i=1;i<4;i++){g.fillRect(vx+vw*.42+i*vw*.125,h*.3,2,h*.12)}
+  const pg=g.createLinearGradient(0,h*.7,0,h*.86);pg.addColorStop(0,t==="day"?"#5FD0E0":"#3A8FA8");pg.addColorStop(1,t==="day"?"#2A9BB8":"#1C5470");g.fillStyle="#EDE6D8";g.fillRect(w*.2,h*.69,w*.6,h*.19);g.fillStyle=pg;g.fillRect(w*.22,h*.71,w*.56,h*.15);
+  g.fillStyle="rgba(255,255,255,.35)";for(let i=0;i<12;i++)g.fillRect(w*.24+r()*w*.5,h*.73+r()*h*.1,w*.04,1.5);
+  const pc=t==="day"?"#3E5B34":"#1C140F";palm(g,w*.1,h*.86,h*.5,pc);palm(g,w*.9,h*.88,h*.44,pc)}
+function paint(kind,seed){try{const [s,t]=kind.split("-"),c=document.createElement("canvas");c.width=960;c.height=600;const g=c.getContext("2d"),r=rng(seed);
+  if(s==="skyline")paintSkyline(g,960,600,t,r);else if(s==="marina")paintSkyline(g,960,600,t,r,{palms:true});else if(s==="tower")paintTower(g,960,600,t,r);else if(s==="interior")paintInterior(g,960,600,t,r);else paintVilla(g,960,600,t,r);
+  return c.toDataURL("image/jpeg",.82)}catch(e){return null}}
+function addDemoPhotos(){L.forEach(u=>{u.demo=true;u.photos=(SCENES[u.id]||[]).map((k,i)=>paint(k,u.id*97+i*13)).filter(Boolean)})}
+let lang="en";
+try{const s=localStorage.getItem("tanazul-lang");if(s==="ar"||s==="en")lang=s}catch(e){}
+const w=k=>W[lang][k]??k;
+const q=n=>Math.round(n).toLocaleString("en-US");
+const nq=n=>`<span class="num">${q(n)}</span>`;
+const qar=n=>W[lang].qar(q(n));
+// English source text captured once
+document.querySelectorAll("[data-t]").forEach(el=>T.en[el.dataset.t]=el.textContent);
+function calc(u){
+  const paidTotal=u.down+u.mon*u.paid, remain=Math.max(0,u.price-paidTotal), left=Math.max(0,u.total-u.paid);
+  const viaMon=Math.min(remain,u.mon*left), balloon=Math.max(0,remain-viaMon), buyerTotal=u.ask+remain;
+  const save=u.mkt>0?(u.mkt-buyerTotal)/u.mkt:0;
+  return{paidTotal,remain,left,viaMon,balloon,buyerTotal,save,premium:u.ask-paidTotal};
+}
+function card(u,open,noToggle){
+  const c=calc(u), pct=x=>(x/u.price*100).toFixed(2)+"%", s=Math.round(c.save*100);
+  const hidden=u.discreet;
+  const name=hidden?W[lang].dName(w(u.area)):(lang==="ar"?(u.ar||u.name):u.name), hand=lang==="ar"&&u.handAr?u.handAr:u.hand;
+  const disc=hidden?`<div class="discreet"><span><span class="lock" aria-hidden="true"></span><b>${w("dTag")}</b></span><span>${w("dBody")}</span>${noToggle?"":reqSet.has(u.id)?`<span class="toast">${w("dSent")}</span>`:`<button class="ghost" type="button" data-req="${u.id}">${w("dReq")}</button>`}</div>`:"";
+  const ph=!hidden&&u.photos&&u.photos.length?`${u.demo?`<span class="gtag">${lang==="ar"?"صورة توضيحية":"Illustration"}</span>`:""}<div class="gallery">${u.photos.map((s,i)=>`<img src="${s}" alt="${name} ${i+1}">`).join("")}</div>${u.photos.length>1?`<div class="gcount">${W[lang].nph(u.photos.length)}</div>`:""}`:"";
+  return `<article class="card">${ph}
+   <div class="top"><div><h3>${name}</h3><div class="meta">${w(u.area)} · ${w(u.type)}${u.sqm?` · <span class="num">${u.sqm}</span> ${lang==="ar"?"م²":"m²"}`:""}</div></div>
+    <div class="save ${s<0?"neg":""}"><b class="num">${s>=0?s:"+"+(-s)}%</b><small>${s>=0?w("under"):w("over")}</small></div></div>
+   <div class="ask"><div><div class="label">${w("pay")}</div><div class="v">${qar(u.ask)}</div></div>
+    <div class="then">${W[lang].then(nq(u.mon),c.left)}${c.balloon>0?"<br>"+W[lang].ball(nq(c.balloon)):""}</div></div>
+   <div><div class="track" role="img" aria-label="${Math.round(c.paidTotal/u.price*100)}%"><i class="d" style="width:${pct(u.down)}"></i><i class="m" style="width:${pct(c.paidTotal-u.down)}"></i></div>
+    <div class="legend"><span style="--c:var(--accent)">${w("down")} ${nq(u.down)}</span><span style="--c:var(--accent-2)">${w("inst")} ${u.paid}/${u.total}</span><span style="--c:var(--line)">${w("left")} ${nq(c.remain)}</span></div></div>
+   ${u.built?`<div><div class="track" role="img" aria-label="${u.built}%"><i class="b" style="width:${u.built}%"></i></div>
+    <div class="legend"><span style="--c:var(--good)">${W[lang].built(u.built,hand)}</span></div></div>`:`<div class="legend"><span style="--c:var(--good)">${W[lang].nobuilt(hand)}</span></div>`}
+   ${disc}
+   <div class="tags"><span class="tag ${u.ver?"ok":"pend"}">${u.ver?w("ver"):w("verP")}</span><span class="tag ${u.noc?"ok":"pend"}">${u.noc?w("noc"):w("nocP")}</span><span class="tag">${w(u.fin)}</span></div>
+   ${noToggle?"":`<button class="more" type="button" aria-expanded="${open}" data-more="${u.id}">${open?w("hide"):w("show")}</button>`}
+   <div class="ledger" ${open?"":"hidden"}>
+    <div class="sub">${w("orig")}</div>
+    <div class="row"><span>${w("cp")}</span><span>${q(u.price)}</span></div>
+    <div class="row"><span>${w("dp")}</span><span>${q(u.down)}</span></div>
+    <div class="row"><span>${W[lang].ip(u.paid,nq(u.mon))}</span><span>${q(u.mon*u.paid)}</span></div>
+    <div class="row total"><span>${w("sp")}</span><span>${q(c.paidTotal)}</span></div>
+    <div class="sub">${w("wyp")}</div>
+    <div class="row"><span>${w("tsn")}</span><span>${q(u.ask)}</span></div>
+    <div class="row"><span>${W[lang].ri(c.left,nq(u.mon))}</span><span>${q(c.viaMon)}</span></div>
+    ${c.balloon>0?`<div class="row"><span>${w("dah")}</span><span>${q(c.balloon)}</span></div>`:""}
+    <div class="row total"><span>${w("ytc")}</span><span>${q(c.buyerTotal)}</span></div>
+    <div class="sub">${w("cmp")}</div>
+    <div class="row"><span>${w("snu")}</span><span>${q(u.mkt)}</span></div>
+    <div class="row total"><span>${c.save>=0?w("ys"):w("ype")}</span><span>${q(Math.abs(u.mkt-c.buyerTotal))}</span></div>
+    <p class="note" style="margin:6px 0 0">${W[lang].prem(c.premium>=0,qar(Math.abs(c.premium)))}</p>
+   </div>
+  </article>`;
+}
+let area="All", sort="save"; const openSet=new Set(), reqSet=new Set();
+const areas=["All",...new Set(L.map(u=>u.area))];
+const areasEl=document.getElementById("areas");
+function renderChips(){areasEl.innerHTML=areas.map(a=>`<button class="chip" type="button" aria-pressed="${a===area}" data-a="${a}">${w(a)}</button>`).join("")}
+areasEl.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;area=b.dataset.a;renderChips();render()});
+document.getElementById("sort").addEventListener("change",e=>{sort=e.target.value;render()});
+function render(){
+  const cash=num("b-cash"), mo=num("b-mon"), active=cash>0||mo>0;
+  const inArea=L.filter(u=>area==="All"||u.area===area);
+  const arr=inArea.filter(u=>!active||((!cash||u.ask<=cash)&&(!mo||u.mon<=mo)));
+  arr.sort((a,b)=>sort==="save"?calc(b).save-calc(a).save:sort==="cash"?a.ask-b.ask:a.ho-b.ho);
+  document.getElementById("list").innerHTML=arr.map(u=>card(u,openSet.has(u.id))).join("");
+  const r=document.getElementById("b-res"); r.hidden=!active; document.getElementById("b-clear").hidden=!active;
+  if(active)r.textContent=W[lang].bRes(arr.length,inArea.length);
+}
+document.getElementById("list").addEventListener("click",e=>{const rq=e.target.closest("[data-req]");if(rq){reqSet.add(+rq.dataset.req);render();return}
+  const b=e.target.closest("[data-more]");if(!b)return;const id=+b.dataset.more;openSet.has(id)?openSet.delete(id):openSet.add(id);render()});
+["b-cash","b-mon"].forEach(i=>{const el=document.getElementById(i);el.addEventListener("input",render);el.addEventListener("blur",()=>{const n=num(i);if(n)el.value=q(n)})});
+document.getElementById("b-clear").addEventListener("click",()=>{document.getElementById("b-cash").value="";document.getElementById("b-mon").value="";render()});
+document.querySelector("nav").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;
+  document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  ["buy","sell","how"].forEach(t=>document.getElementById(t).hidden=t!==b.dataset.tab);window.scrollTo(0,0)});
+const val=id=>document.getElementById(id).value;
+const num=id=>+(val(id).replace(/[^\d.]/g,""))||0;
+function sell(){
+  const u={id:0,name:w("your"),ar:w("your"),area:val("s-area"),type:val("s-type"),sqm:0,price:num("s-price"),down:num("s-down"),mon:num("s-mon"),
+    paid:Math.round(num("s-paid")),total:Math.round(num("s-total")),hand:val("s-hand")||"—",built:0,fin:val("s-fin"),ask:num("s-ask"),mkt:num("s-mkt"),ver:false,noc:false,photos,discreet:document.getElementById("s-disc").checked};
+  const v=document.getElementById("verdict"), p=document.getElementById("preview"), o=document.getElementById("opts");
+  if(!u.price||u.down+u.mon*u.paid>u.price){v.innerHTML=w("e1");p.innerHTML="";o.innerHTML="";return}
+  if(u.paid>u.total){v.innerHTML=w("e2");p.innerHTML="";o.innerHTML="";return}
+  {const cc=calc(u), fee=Math.round(u.price*0.015), net=Math.max(0,u.ask-fee), pen=Math.min(100,num("s-pen")), refund=Math.round(cc.paidTotal*(1-pen/100)), X=W[lang];
+   const tBest=net>=refund;
+   o.innerHTML=`<div class="opt ${tBest?"best":""}"><div class="oh"><h3>${X.oT}</h3>${tBest?`<span class="pill">${X.best}</span>`:""}</div><div class="amt">${qar(net)}</div><p>${X.oTp(qar(fee))}</p></div>
+    <div class="opt ${!tBest?"best":""}"><div class="oh"><h3>${X.oC}</h3>${!tBest?`<span class="pill">${X.best}</span>`:""}</div><div class="amt">≈ ${qar(refund)}</div><p>${X.oCp(pen)}</p></div>
+    <div class="opt bad"><div class="oh"><h3>${X.oS}</h3></div><div class="amt">${X.oSa}</div><p>${X.oSp}</p></div>`;}
+  const c=calc(u), s=Math.round(c.save*100), X=W[lang];
+  let msg=X.vPaid(qar(c.paidTotal),qar(c.remain));
+  msg+=c.save<0?X.vNeg(qar(Math.max(0,u.mkt-c.remain))):c.save<0.1?X.vThin(s):X.vGood(s);
+  if(u.fin==="Bank finance")msg+=X.vBank;
+  v.innerHTML=msg; p.innerHTML=card(u,true,true);
+}
+["s-area","s-type","s-price","s-down","s-mon","s-paid","s-total","s-mkt","s-ask","s-fin","s-hand","s-pen","s-disc"].forEach(i=>document.getElementById(i).addEventListener("input",()=>{document.getElementById("toast").hidden=true;sell()}));
+document.querySelectorAll("#sf input[inputmode=numeric]").forEach(el=>el.addEventListener("blur",()=>{const n=num(el.id);if(n)el.value=q(n)}));
+document.getElementById("sf").addEventListener("submit",e=>{e.preventDefault();document.getElementById("toast").hidden=false});
+// Photos: resized in the browser, kept in memory for this prototype
+let photos=[];
+function shrink(file){return new Promise(res=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{
+  const k=Math.min(1,1280/Math.max(img.width,img.height)),c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+  c.getContext("2d").drawImage(img,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.82))};img.onerror=()=>res(null);img.src=r.result};r.onerror=()=>res(null);r.readAsDataURL(file)})}
+async function addFiles(list){
+  const files=[...list].filter(f=>f.type.startsWith("image/"));
+  for(const f of files){if(photos.length>=10){document.getElementById("verdict").textContent=w("max");break}const d=await shrink(f);if(d)photos.push(d)}
+  renderThumbs();sell();
+}
+function renderThumbs(){
+  document.getElementById("thumbs").innerHTML=photos.map((s,i)=>`<div class="thumb"><img src="${s}" alt="">${i===0?`<span class="cov">${w("cover")}</span>`:""}<button type="button" data-rm="${i}" aria-label="${w("rm")}">×</button></div>`).join("");
+}
+document.getElementById("thumbs").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;photos.splice(+b.dataset.rm,1);renderThumbs();sell()});
+document.getElementById("s-photos").addEventListener("change",e=>{addFiles(e.target.files);e.target.value=""});
+const drop=document.getElementById("drop");
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+drop.addEventListener("drop",e=>{if(e.dataTransfer&&e.dataTransfer.files)addFiles(e.dataTransfer.files)});
+function applyLang(){
+  const root=document.documentElement; root.lang=lang; root.dir=lang==="ar"?"rtl":"ltr";
+  document.querySelectorAll("[data-t]").forEach(el=>{const k=el.dataset.t;el.textContent=(T[lang][k]??T.en[k])});
+  document.querySelectorAll("#s-area option,#s-type option,#s-fin option").forEach(o=>o.textContent=w(o.value));
+  const b=document.getElementById("lang"); b.textContent=lang==="ar"?"English":"العربية"; b.lang=lang==="ar"?"en":"ar";
+  document.title=lang==="ar"?"تنازل · إعادة بيع العقارات على الخارطة":"Tanazul Off-Plan Resale";
+  renderChips(); render(); sell();
+}
+document.getElementById("lang").addEventListener("click",()=>{lang=lang==="ar"?"en":"ar";try{localStorage.setItem("tanazul-lang",lang)}catch(e){};applyLang()});
+addDemoPhotos();
+applyLang();
+</script>
+
+</body>
+</html>
